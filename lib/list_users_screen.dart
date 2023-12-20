@@ -173,7 +173,7 @@ class _UserListScreenState extends State<UserListScreen> {
       if (data != null && data is Map<dynamic, dynamic>) {
         List<User> fetchedUsers = [];
         data.forEach((key, value) {
-          fetchedUsers.add(User.fromJson(value));
+          fetchedUsers.add(User.fromSnapshot(value));
         });
         setState(() {
           users = fetchedUsers;
@@ -220,7 +220,7 @@ class _UserListScreenState extends State<UserListScreen> {
               },
             ),
             title: Text(
-                'ID: ${user.id}, Usuario: ${user.email}, Email: ${user.pass}'),
+                'ID: ${user.key}, Usuario: ${user.email}, Email: ${user.pass}'),
           );
         },
       ),
@@ -231,7 +231,7 @@ class _UserListScreenState extends State<UserListScreen> {
 
             for (int i = 0; i < selectedUsers.length; i++) {
               if (selectedUsers[i]) {
-                usuariosAEliminar.add(users[i].id);
+                usuariosAEliminar.add(int.parse(users[i].key));
               }
             }
 
@@ -240,7 +240,7 @@ class _UserListScreenState extends State<UserListScreen> {
             // Elimina usuarios seleccionados de la lista
             for (int i = usuariosAEliminar.length - 1; i >= 0; i--) {
               final userId = usuariosAEliminar[i];
-              users.removeWhere((user) => user.id == userId);
+              users.removeWhere((user) => user.key == userId.toString());
               selectedUsers.removeAt(i);
             }
 
