@@ -24,7 +24,7 @@ class LoginScreen extends StatelessWidget {
 
   Future<void> _performLogin(BuildContext context) async {
     final usuario = _usuarioTextEditingController.text;
-    final email = _emailTextEditingController.text;
+    final pass = _emailTextEditingController.text;
 
     final response = await fetchUsers();
     if (response.statusCode == 200) {
@@ -35,7 +35,7 @@ class LoginScreen extends StatelessWidget {
         final String name = userData['name'];
         final String userEmail = userData['email'];
 
-        if (name == usuario && userEmail == email) {
+        if (name == usuario && userEmail == pass) {
           credentialsMatch = true;
           break;
         }
