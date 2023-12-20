@@ -18,6 +18,9 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^2.0.0
+  firebase_core: ^2.24.2 # Firebase Core
+  firebase_auth: ^4.15.3 # Autenticación de Firebase
+  firebase_database: ^10.3.8 # Base de datos en tiempo real de Firebase
 
 flutter:
   uses-material-design: true
