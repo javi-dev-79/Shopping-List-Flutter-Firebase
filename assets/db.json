@@ -1,0 +1,80 @@
+{
+  "users": [
+    {
+      "id": 1,
+      "name": "javi",
+      "email": "javi"
+    },
+    {
+      "name": "juan",
+      "email": "juan",
+      "id": 3
+    }
+  ],
+  "products": [
+    {
+      "id": 1,
+      "name": "Manzanas",
+      "category": "Frutas",
+      "price": 1.99,
+      "quantity": 0,
+      "selected": true
+    },
+    {
+      "id": 2,
+      "name": "Leche",
+      "category": "Lácteos",
+      "price": 2.49,
+      "quantity": 0,
+      "selected": false
+    },
+    {
+      "id": 4,
+      "name": "Huevos",
+      "category": "Lácteos",
+      "price": 3.99,
+      "quantity": 0,
+      "selected": true
+    },
+    {
+      "id": 7,
+      "name": "Zanahoria",
+      "category": "Hortalizas",
+      "price": 3,
+      "quantity": 2,
+      "selected": true
+    },
+    {
+      "id": 8,
+      "name": "Piña",
+      "category": "Fruta",
+      "price": 3,
+      "quantity": 20,
+      "selected": false
+    },
+    {
+      "id": 11,
+      "name": "Limones",
+      "category": "Frutas",
+      "price": 3.33,
+      "quantity": 4,
+      "selected": true
+    },
+    {
+      "name": "Lechuga",
+      "category": "Verdura",
+      "price": 9.32,
+      "quantity": 3,
+      "selected": false,
+      "id": 12
+    },
+    {
+      "name": "Papa",
+      "category": "Tubérculos",
+      "price": "9.0",
+      "quantity": "2",
+      "selected": "false",
+      "id": 13
+    }
+  ]
+}
