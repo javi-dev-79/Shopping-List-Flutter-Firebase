@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
-// import 'package:http/http.dart' as http;
+import 'package:flutter_application_3/auth_service.dart';
 import 'package:logger/logger.dart';
-
-// import 'constants.dart';
 import 'list_users_screen.dart';
-
 import 'package:firebase_database/firebase_database.dart';
 
 class RegistrationScreen extends StatelessWidget {
@@ -22,35 +19,9 @@ class RegistrationScreen extends StatelessWidget {
 
   final DatabaseReference dbRef = FirebaseDatabase.instance.ref();
 
+  AuthService authService = AuthService();
+
   RegistrationScreen({Key? key}) : super(key: key);
-
-  // Future<http.Response> registerUser(String email, String pass) async {
-  //   // final url = Uri.parse(
-  //   //     'http://$host:3000/users'); // Reemplaza con la URL de tu servidor JSON
-  //   final url =
-  //       Uri.parse('http://$host:3000/users'); // Actualiza la URL a "db.json"
-
-  //   final response = await http.post(url, body: {
-  //     'email': email,
-  //     'pass': pass,
-  //   });
-
-  //   return response;
-  // }
-
-  Future<void> registerUser(String email, String pass) async {
-    try {
-      await dbRef.child('users').push().set({
-        'email': email,
-        'password': pass,
-      });
-      // Registro exitoso
-      logger.d('Usuario registrado exitosamente');
-    } catch (e) {
-      // Manejo de errores
-      logger.e('Error al registrar el usuario: $e');
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -97,20 +68,8 @@ class RegistrationScreen extends StatelessWidget {
                 final email = _registrationTextEditingController.text;
                 final pass = _registrationEmailEditingController.text;
 
-                await registerUser(email, pass);
+                await authService.registerWithEmailAndPassword(email, pass);
 
-                // if (response.statusCode == 201) {
-                //   logger.d('Usuario registrado con éxito');
-                //   // Navegar de nuevo a la pantalla de inicio de sesión después de un registro exitoso
-                //   // Navigator.of(context).push(
-                //   //   MaterialPageRoute(
-                //   //     builder: (context) => LoginScreen(),
-                //   //   ),
-                //   // );
-                // } else {
-                //   logger.e(
-                //       'Error al registrar el usuario. Código de estado: ${response.statusCode}');
-                // }
                 // Borra los campos TextField
                 _registrationTextEditingController.clear();
                 _registrationEmailEditingController.clear();
