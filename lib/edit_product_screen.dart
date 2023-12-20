@@ -191,17 +191,12 @@ class EditProductScreen extends StatefulWidget {
 
 class _EditProductScreenState extends State<EditProductScreen> {
 
-  late BuildContext _screenContext; // Almacena una referencia al contexto
-
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _categoryController = TextEditingController();
   final TextEditingController _priceController = TextEditingController();
   final TextEditingController _quantityController = TextEditingController();
 
   final Logger logger = Logger();
-
-  final DatabaseReference _productRef =
-      FirebaseDatabase.instance.ref().child('products');
 
   @override
   void initState() {
@@ -210,8 +205,6 @@ class _EditProductScreenState extends State<EditProductScreen> {
     _categoryController.text = widget.product.category;
     _priceController.text = widget.product.price.toStringAsFixed(2);
     _quantityController.text = widget.product.quantity.toString();
-
-    _screenContext = context;
   }
 
   @override
@@ -316,7 +309,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
 
                 await _updateProductInList(updatedProduct);
 
-                Navigator.pop(context, updatedProduct);
+                await _handleUpdate(updatedProduct);
               },
               style: ButtonStyle(
                 backgroundColor: MaterialStateProperty.all(Colors.orange),
@@ -329,9 +322,11 @@ class _EditProductScreenState extends State<EditProductScreen> {
     );
   }
 
- Future<Product?> _updateProductInList(Product product) async {
-    final DatabaseReference productRef =
-        FirebaseDatabase.instance.ref().child('products').child(product.id.toString());
+  Future<Product?> _updateProductInList(Product product) async {
+    final DatabaseReference productRef = FirebaseDatabase.instance
+        .ref()
+        .child('products')
+        .child(product.id.toString());
 
     final double price = product.price;
     final int quantity = product.quantity;
@@ -348,13 +343,14 @@ class _EditProductScreenState extends State<EditProductScreen> {
     return product;
   }
 
-    // Método para manejar la actualización y cerrar la pantalla
   Future<void> _handleUpdate(Product updatedProduct) async {
-    final result = await _updateProductInList(updatedProduct);
-    if (result != null) {
-      // Usa el contexto local para cerrar la pantalla
-      Navigator.pop(_screenContext, result);
+    if (mounted) {
+      // Realizar operaciones aquí solo si el widget está montado
+      final result = await _updateProductInList(updatedProduct);
+      if (result != null) {
+        // ignore: use_build_context_synchronously
+        Navigator.pop(context, result);
+      }
     }
-    
   }
 }
