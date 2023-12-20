@@ -220,7 +220,7 @@ class _UserListScreenState extends State<UserListScreen> {
               },
             ),
             title: Text(
-                'ID: ${user.id}, Usuario: ${user.name}, Email: ${user.email}'),
+                'ID: ${user.id}, Usuario: ${user.email}, Email: ${user.pass}'),
           );
         },
       ),
