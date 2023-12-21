@@ -167,8 +167,6 @@ class _PrivateScreenState extends State<PrivateScreen> {
                                     .child(product.id);
 
                             _deleteProduct(productRef);
-
-                            _logger.i('El producto es: $productRef');
                           },
                         ),
                       ],

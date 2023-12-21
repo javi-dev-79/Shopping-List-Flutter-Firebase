@@ -29,7 +29,6 @@ class _UserListScreenState extends State<UserListScreen> {
     DatabaseReference usersRef = FirebaseDatabase.instance.ref().child('users');
 
     usersRef.onValue.listen((event) {
-      _logger.i('PASA AQUÍ');
       if (event.snapshot.value != null) {
         List<dynamic>? usersData = event.snapshot.value as List<dynamic>?;
 
@@ -37,37 +36,12 @@ class _UserListScreenState extends State<UserListScreen> {
           setState(() {
             userList = usersData.cast<Map<dynamic, dynamic>>().toList();
           });
-
-          _logger.i('Lista de usuarios: $userList');
         }
       }
     }, onError: (error) {
       _logger.e('Error al obtener usuarios: $error');
     });
   }
-
-  // Future<void> fetchUsersFromFirebase() async {
-  //   final usersRef = FirebaseDatabase.instance.ref().child('users');
-  //   usersRef.onValue.listen((event) {
-  //     DataSnapshot snapshot = event.snapshot;
-  //     dynamic data = snapshot.value;
-
-  //     if (data != null && data is Map<dynamic, dynamic>) {
-  //       List<User> fetchedUsers = [];
-  //       data.forEach((key, value) {
-  //         fetchedUsers.add(User.fromSnapshot(value));
-  //       });
-  //       setState(() {
-  //         users = fetchedUsers;
-  //         selectedUsers = List.generate(users.length, (index) => false);
-  //       });
-  //     }
-  //   }, onError: (error) {
-  //     ScaffoldMessenger.of(context).showSnackBar(
-  //       const SnackBar(content: Text('Error al obtener usuarios')),
-  //     );
-  //   });
-  // }
 
   Future<void> eliminarUsuariosEnFirebase(List<int> usuariosAEliminar) async {
     final usersRef = FirebaseDatabase.instance.ref().child('users');

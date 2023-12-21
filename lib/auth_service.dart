@@ -80,4 +80,14 @@ class AuthService {
       return false;
     }
   }
+
+  static Future<void> logout() async {
+    try {
+      await _auth.signOut();
+      isLoggedIn = false;
+    } catch (e) {
+      print('Error al cerrar sesión: $e');
+      // Manejo de errores: puedes mostrar un mensaje de error o realizar otras acciones aquí
+    }
+  }
 }

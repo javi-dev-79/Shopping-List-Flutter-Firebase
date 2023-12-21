@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application_3/auth_service.dart';
-import 'package:logger/logger.dart';
 import 'login_screen.dart';
 import 'private_screen.dart';
 import 'public_screen.dart';
@@ -12,12 +11,10 @@ class MyBottomNavigationBar extends StatefulWidget {
 
   @override
   _MyBottomNavigationBarState createState() => _MyBottomNavigationBarState();
-
 }
 
 class _MyBottomNavigationBarState extends State<MyBottomNavigationBar> {
   int _selectedIndex = 0; // Índice de la página seleccionada
-  final Logger _logger = Logger();
 
   @override
   void initState() {
@@ -32,6 +29,15 @@ class _MyBottomNavigationBarState extends State<MyBottomNavigationBar> {
       appBar: AppBar(
         title: const Text('Mi Aplicación'),
         backgroundColor: Colors.orange,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.exit_to_app),
+            onPressed: () {
+              // Aquí debes implementar la lógica para realizar el logout
+              _performLogout();
+            },
+          ),
+        ],
       ),
       body: _getBody(),
       bottomNavigationBar: BottomNavigationBar(
@@ -53,14 +59,6 @@ class _MyBottomNavigationBarState extends State<MyBottomNavigationBar> {
     );
   }
 
-  // Widget _getBody() {
-  //   if (_selectedIndex == 0 || !isLoggedIn) {
-  //     return const PublicScreen();
-  //   } else {
-  //     return const PrivateScreen();
-  //   }
-  // }
-
   Widget _getBody() {
     if (_selectedIndex == 1 && AuthService.isLoggedIn) {
       return const PrivateScreen();
@@ -70,7 +68,7 @@ class _MyBottomNavigationBarState extends State<MyBottomNavigationBar> {
   }
 
   void _onItemTapped(int index) {
-    _logger.i('El estado en onItemTapped es: ${AuthService.isLoggedIn}');
+    // _logger.i('El estado en onItemTapped es: ${AuthService.isLoggedIn}');
     setState(() {
       _selectedIndex = index;
       if (_selectedIndex == 1 && !AuthService.isLoggedIn) {
@@ -89,5 +87,19 @@ class _MyBottomNavigationBarState extends State<MyBottomNavigationBar> {
         });
       }
     });
+  }
+
+  void _performLogout() {
+    AuthService.logout(); // Ejemplo: cómo podrías llamar a un método logout
+    // Navigator.of(context).push(MaterialPageRoute(
+    //   builder: (context) => LoginScreen(),
+    // ));
+    // Navega a la pantalla de inicio o pantalla lógica después del logout
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (context) => AuthService.isLoggedIn ? const PrivateScreen() : const PublicScreen(),
+      ),
+    );
   }
 }
