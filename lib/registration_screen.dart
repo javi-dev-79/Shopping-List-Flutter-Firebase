@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application_3/auth_service.dart';
+import 'package:flutter_application_3/login_screen.dart';
 import 'package:logger/logger.dart';
 import 'list_users_screen.dart';
 import 'package:firebase_database/firebase_database.dart';
@@ -21,7 +22,7 @@ class RegistrationScreen extends StatelessWidget {
 
   final AuthService authService = AuthService();
 
-  RegistrationScreen({Key? key}) : super(key: key);
+  RegistrationScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -76,6 +77,12 @@ class RegistrationScreen extends StatelessWidget {
 
                 // Enfoca nuevamente el campo 'Usuario'
                 _emailFocusNode.requestFocus();
+                // Navega a LogicScreen después de registrarse
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => LoginScreen(),
+                  ),
+                );
               },
               style: ButtonStyle(
                 backgroundColor: MaterialStateProperty.all(Colors.orange),
@@ -106,5 +113,4 @@ class RegistrationScreen extends StatelessWidget {
       ),
     );
   }
-  
 }
