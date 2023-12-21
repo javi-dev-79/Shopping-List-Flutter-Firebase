@@ -1,6 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:logger/logger.dart';
-import 'package:flutter_application_3/bottom_nav_bar.dart';
 
 class AuthService {
   static final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -25,20 +24,6 @@ class AuthService {
       return null;
     }
   }
-
-  // Future<bool> signInWithEmailAndPassword(String email, String password) async {
-  //   try {
-  //     UserCredential result = await _auth.signInWithEmailAndPassword(
-  //       email: email,
-  //       password: password,
-  //     );
-  //     User? user = result.user;
-  //     return user != null;
-  //   } catch (e) {
-  //     _logger.e('Error al iniciar sesión: $e');
-  //     return false;
-  //   }
-  // }
 
   Future<bool> signInWithEmailAndPassword(String email, String password) async {
     try {
@@ -91,7 +76,7 @@ class AuthService {
       return isLoggedIn;
     } catch (e) {
       // Manejo de errores si ocurren al verificar el estado de autenticación
-      print('Error al verificar el estado de autenticación: $e');
+      // print('Error al verificar el estado de autenticación: $e');
       return false;
     }
   }

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
 import 'add_product_screen.dart';
@@ -7,9 +9,10 @@ import 'product.dart';
 import 'package:firebase_database/firebase_database.dart';
 
 class PrivateScreen extends StatefulWidget {
-  const PrivateScreen({Key? key}) : super(key: key);
+  const PrivateScreen({super.key});
 
   @override
+  // ignore: library_private_types_in_public_api
   _PrivateScreenState createState() => _PrivateScreenState();
 }
 
@@ -18,7 +21,7 @@ class _PrivateScreenState extends State<PrivateScreen> {
 
   List<Product> products = [];
 
-  final Logger logger = Logger();
+  final Logger _logger = Logger();
 
   @override
   void initState() {
@@ -78,7 +81,6 @@ class _PrivateScreenState extends State<PrivateScreen> {
       );
     });
 
-    // Agrega un return al final para cumplir con la firma de Future<void>
     return Future.value();
   }
 
@@ -94,127 +96,146 @@ class _PrivateScreenState extends State<PrivateScreen> {
       'quantity': nuevoProducto.quantity,
       'selected': nuevoProducto.selected,
     }).then((_) {
-      logger.i('Producto agregado exitosamente a Firebase.');
+      _logger.i('Producto agregado exitosamente a Firebase.');
     }).catchError((error) {
-      logger.e('Error al agregar el producto a Firebase: $error');
+      _logger.e('Error al agregar el producto a Firebase: $error');
       // Maneja errores si la adición del producto falla
     });
   }
 
   @override
-Widget build(BuildContext context) {
-  return Scaffold(
-    body: Padding(
-      padding: const EdgeInsets.only(top: 20.0),
-      child: Column(
-        children: [
-          Expanded(
-            child: ListView.builder(
-              itemCount: products.length,
-              itemBuilder: (context, index) {
-                final product = products[index];
-                return ListTile(
-                  leading: Checkbox(
-                    activeColor: Colors.orange,
-                    value: product.selected,
-                    onChanged: (value) {
-                      setState(() {
-                        product.selected = value!;
-                        _updateProduct(product);
-                      });
-                    },
-                  ),
-                  title: Text(
-                    'Nombre: ${product.name}',
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Padding(
+        padding: const EdgeInsets.only(top: 20.0),
+        child: Column(
+          children: [
+            Expanded(
+              child: ListView.builder(
+                itemCount: products.length,
+                itemBuilder: (context, index) {
+                  final product = products[index];
+                  return ListTile(
+                    leading: Checkbox(
+                      activeColor: Colors.orange,
+                      value: product.selected,
+                      onChanged: (value) {
+                        setState(() {
+                          product.selected = value!;
+                          _updateProduct(product);
+                        });
+                      },
                     ),
-                  ),
-                  subtitle: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text('Categoría: ${product.category}'),
-                      Text('Precio: ${product.price.toStringAsFixed(2)}€'),
-                      Text('Cantidad: ${product.quantity.toString()}'),
-                    ],
-                  ),
-                  trailing: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      IconButton(
-                        icon: const Icon(
-                          Icons.edit,
-                          color: Color.fromARGB(255, 24, 152, 211),
-                        ),
-                        onPressed: () {
-                          _editProduct(product);
-                        },
+                    title: Text(
+                      'Nombre: ${product.name}',
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
                       ),
-                      IconButton(
-                        icon: const Icon(
-                          Icons.delete,
-                          color: Color.fromARGB(255, 226, 76, 66),
+                    ),
+                    subtitle: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('Categoría: ${product.category}'),
+                        Text('Precio: ${product.price.toStringAsFixed(2)}€'),
+                        Text('Cantidad: ${product.quantity.toString()}'),
+                      ],
+                    ),
+                    trailing: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        IconButton(
+                          icon: const Icon(
+                            Icons.edit,
+                            color: Color.fromARGB(255, 24, 152, 211),
+                          ),
+                          onPressed: () {
+                            _editProduct(product);
+                          },
                         ),
-                        onPressed: () {
-                          _deleteProduct(int.parse(product.id));
-                        },
-                      ),
-                    ],
-                  ),
-                );
-              },
-            ),
-          ),
-        ],
-      ),
-    ),
-    floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
-    bottomNavigationBar: BottomAppBar(
-      shape: const CircularNotchedRectangle(),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(10.0),
-            child: Container(
-              decoration: const BoxDecoration(
-                color: Colors.orange,
-                shape: BoxShape.circle,
-              ),
-              child: IconButton(
-                onPressed: () {
-                  fetchProducts();
+                        IconButton(
+                          icon: const Icon(
+                            Icons.delete,
+                            color: Color.fromARGB(255, 226, 76, 66),
+                          ),
+                          onPressed: () async {
+                            FirebaseDatabase.instance.ref().child('products');
+
+                            final DatabaseReference productRef =
+                                FirebaseDatabase.instance
+                                    .ref()
+                                    .child('products')
+                                    .child(product.id);
+
+                            _logger.i('El producto es: $productRef');
+
+                            final uid = await getProductUID(productRef);
+                            _logger.i('El uid es: $uid');
+
+                            if (uid.isNotEmpty) {
+                              _deleteProduct(uid);
+                            } else {
+                              // Manejar el caso si no se obtuvo un UID válido
+                              _logger
+                                  .e('No se pudo obtener el UID del producto');
+                            }
+                          },
+                        ),
+                      ],
+                    ),
+                  );
                 },
-                icon: const Icon(
-                  IconData(0xe514, fontFamily: 'MaterialIcons'),
-                  color: Colors.white,
+              ),
+            ),
+          ],
+        ),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
+      bottomNavigationBar: BottomAppBar(
+        shape: const CircularNotchedRectangle(),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(10.0),
+              child: Container(
+                decoration: const BoxDecoration(
+                  color: Colors.orange,
+                  shape: BoxShape.circle,
+                ),
+                child: IconButton(
+                  onPressed: () {
+                    fetchProducts();
+                  },
+                  icon: const Icon(
+                    IconData(0xe514, fontFamily: 'MaterialIcons'),
+                    color: Colors.white,
+                  ),
                 ),
               ),
             ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(10.0),
-            child: Container(
-              decoration: const BoxDecoration(
-                color: Colors.green,
-                shape: BoxShape.circle,
-              ),
-              child: IconButton(
-                onPressed: () {
-                  _addProduct();
-                },
-                icon: const Icon(
-                  Icons.add,
-                  color: Colors.white,
+            Padding(
+              padding: const EdgeInsets.all(10.0),
+              child: Container(
+                decoration: const BoxDecoration(
+                  color: Colors.green,
+                  shape: BoxShape.circle,
+                ),
+                child: IconButton(
+                  onPressed: () {
+                    _addProduct();
+                  },
+                  icon: const Icon(
+                    Icons.add,
+                    color: Colors.white,
+                  ),
                 ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
-    ),
-  );
-}
+    );
+  }
 
   void _updateProduct(Product product) {
     _productRef.child(product.id.toString()).set({
@@ -247,6 +268,7 @@ Widget build(BuildContext context) {
     ).then((updatedProduct) {
       if (updatedProduct != null) {
         // Actualiza el producto en la lista o realiza cualquier acción necesaria
+        actualizarListaProductos;
         // Puedes hacer esto en base a los datos de updatedProduct
         setState(() {
           // Busca el producto en la lista y actualiza sus datos
@@ -259,7 +281,25 @@ Widget build(BuildContext context) {
     });
   }
 
-  void _deleteProduct(int productId) {
+  Future<String> getProductUID(DatabaseReference reference) async {
+    try {
+      DataSnapshot snapshot = (await reference.once()) as DataSnapshot;
+      if (snapshot.value != null) {
+        String uid = snapshot.key ?? ''; // Obtiene el UID del nodo
+        return uid;
+      } else {
+        return ''; // Retorna una cadena vacía si no hay datos
+      }
+    } catch (error) {
+      _logger.e('Error al obtener el UID: $error');
+      return ''; // Retorna una cadena vacía en caso de error
+    }
+  }
+
+  void _deleteProduct(String productUid) {
+    final DatabaseReference productRef =
+        FirebaseDatabase.instance.ref().child('products').child(productUid);
+
     showDialog(
       context: context,
       builder: (context) {
@@ -270,9 +310,21 @@ Widget build(BuildContext context) {
           actions: [
             TextButton(
               onPressed: () async {
+                await productRef.remove().then((_) {
+                  setState(() {
+                    products.removeWhere((product) => product.id == productUid);
+                  });
+                  _logger.i('Producto eliminado exitosamente de Firebase.');
+                }).catchError((error) {
+                  _logger
+                      .e('Error al eliminar el producto de Firebase: $error');
+                  // Manejar errores si la eliminación del producto falla
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                        content: Text('Error al eliminar el producto')),
+                  );
+                });
                 Navigator.pop(context);
-                _performDelete(productId);
-                fetchProducts();
               },
               child: const Text('Eliminar'),
             ),
@@ -287,21 +339,4 @@ Widget build(BuildContext context) {
       },
     );
   }
-
-  void _performDelete(int productId) {
-  _productRef.child('$productId').remove().then((_) {
-    setState(() {
-      products.removeWhere((product) => product.id == productId.toString());
-    });
-    logger.i('Producto eliminado exitosamente de Firebase.');
-  }).catchError((error) {
-    logger.e('Error al eliminar el producto de Firebase: $error');
-    // Maneja errores si la eliminación del producto falla
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Error al eliminar el producto')),
-    );
-  });
-}
-
-
 }
