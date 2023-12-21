@@ -166,18 +166,9 @@ class _PrivateScreenState extends State<PrivateScreen> {
                                     .child('products')
                                     .child(product.id);
 
+                            _deleteProduct(productRef);
+
                             _logger.i('El producto es: $productRef');
-
-                            final uid = await getProductUID(productRef);
-                            _logger.i('El uid es: $uid');
-
-                            if (uid.isNotEmpty) {
-                              _deleteProduct(uid);
-                            } else {
-                              // Manejar el caso si no se obtuvo un UID válido
-                              _logger
-                                  .e('No se pudo obtener el UID del producto');
-                            }
                           },
                         ),
                       ],
@@ -281,25 +272,7 @@ class _PrivateScreenState extends State<PrivateScreen> {
     });
   }
 
-  Future<String> getProductUID(DatabaseReference reference) async {
-    try {
-      DataSnapshot snapshot = (await reference.once()) as DataSnapshot;
-      if (snapshot.value != null) {
-        String uid = snapshot.key ?? ''; // Obtiene el UID del nodo
-        return uid;
-      } else {
-        return ''; // Retorna una cadena vacía si no hay datos
-      }
-    } catch (error) {
-      _logger.e('Error al obtener el UID: $error');
-      return ''; // Retorna una cadena vacía en caso de error
-    }
-  }
-
-  void _deleteProduct(String productUid) {
-    final DatabaseReference productRef =
-        FirebaseDatabase.instance.ref().child('products').child(productUid);
-
+  void _deleteProduct(DatabaseReference productRef) {
     showDialog(
       context: context,
       builder: (context) {
@@ -312,7 +285,8 @@ class _PrivateScreenState extends State<PrivateScreen> {
               onPressed: () async {
                 await productRef.remove().then((_) {
                   setState(() {
-                    products.removeWhere((product) => product.id == productUid);
+                    products.removeWhere(
+                        (product) => product.id == productRef.key.toString());
                   });
                   _logger.i('Producto eliminado exitosamente de Firebase.');
                 }).catchError((error) {
