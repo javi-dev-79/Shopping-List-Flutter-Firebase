@@ -163,35 +163,36 @@
 // ****************************************************************************************
 
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:logger/logger.dart';
+// import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter_application_3/auth_service.dart';
 import 'registration_screen.dart';
 
 class LoginScreen extends StatelessWidget {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  final Logger _logger = Logger();
+
+  final AuthService authService = AuthService();
 
   LoginScreen({Key? key}) : super(key: key);
 
-  Future<void> _performLogin(String email, String password) async {
-    try {
-      UserCredential userCredential =
-          await FirebaseAuth.instance.signInWithEmailAndPassword(
-        email: email,
-        password: password,
-      );
+  // Future<void> _performLogin(String email, String password) async {
+  //   try {
+  //     UserCredential userCredential =
+  //         await FirebaseAuth.instance.signInWithEmailAndPassword(
+  //       email: email,
+  //       password: password,
+  //     );
 
-      if (userCredential.user != null) {
-        _logger.d(
-            'Inicio de sesión exitoso para el usuario ${userCredential.user!.email}');
-      } else {
-        _logger.e('Credenciales incorrectas');
-      }
-    } on FirebaseAuthException catch (e) {
-      _logger.e('Error al iniciar sesión: ${e.message}');
-    }
-  }
+  //     if (userCredential.user != null) {
+  //       _logger.d(
+  //           'Inicio de sesión exitoso para el usuario ${userCredential.user!.email}');
+  //     } else {
+  //       _logger.e('Credenciales incorrectas');
+  //     }
+  //   } on FirebaseAuthException catch (e) {
+  //     _logger.e('Error al iniciar sesión: ${e.message}');
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -240,7 +241,8 @@ class LoginScreen extends StatelessWidget {
               onPressed: () {
                 String email = _emailController.text;
                 String password = _passwordController.text;
-                _performLogin(email, password);
+                // _performLogin(email, password);
+                authService.signInWithEmailAndPassword(email, password);
               },
               style: ButtonStyle(
                 backgroundColor: MaterialStateProperty.all(Colors.orange),

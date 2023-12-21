@@ -38,18 +38,38 @@
 
 // ****************************************************************************
 
-
 import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter_application_3/firebase_options.dart';
+// import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'bottom_nav_bar.dart';
 import 'package:firebase_core/firebase_core.dart'; // Importa el paquete de Firebase
 
-void main() async {
-  WidgetsFlutterBinding.ensureInitialized(); // Asegúrate de que Flutter esté inicializado
-  await dotenv.load(
-    fileName: ".env",
-  ); // Carga las variables de entorno desde el archivo .env
-  await Firebase.initializeApp(); // Inicializa Firebase
+// void main() async {
+//   WidgetsFlutterBinding.ensureInitialized(); // Asegúrate de que Flutter esté inicializado
+//   await dotenv.load(
+//     fileName: ".env",
+//   ); // Carga las variables de entorno desde el archivo .env
+//   await Firebase.initializeApp(); // Inicializa Firebase
+
+//   runApp(
+//     MaterialApp(
+//       theme: ThemeData(
+//         unselectedWidgetColor:
+//             Colors.orange, // Color del checkbox no seleccionado
+//         // Otros ajustes de estilo que desees aplicar a toda la aplicación
+//       ),
+//       home: const MyApp(),
+//       debugShowCheckedModeBanner: false,
+//     ),
+//   );
+// }
+
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
 
   runApp(
     MaterialApp(
@@ -75,5 +95,3 @@ class MyApp extends StatelessWidget {
     );
   }
 }
-
-

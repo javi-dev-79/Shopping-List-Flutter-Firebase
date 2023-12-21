@@ -154,46 +154,69 @@ class UserListScreen extends StatefulWidget {
 class _UserListScreenState extends State<UserListScreen> {
   List<User> users = [];
   List<bool> selectedUsers = [];
+  List<Map<dynamic, dynamic>> userList = [];
 
-  final Logger logger = Logger();
+  final Logger _logger = Logger();
 
   @override
   void initState() {
     super.initState();
-    // Inicializa la lista de usuarios con datos de users.json
-    fetchUsersFromFirebase();
+    // Inicializa la lista de usuarios con datos de firebase
+    // fetchUsersFromFirebase();
+    fetchUsers();
   }
 
-  Future<void> fetchUsersFromFirebase() async {
-    final usersRef = FirebaseDatabase.instance.ref().child('users');
-    usersRef.onValue.listen((event) {
-      DataSnapshot snapshot = event.snapshot;
-      dynamic data = snapshot.value;
+  void fetchUsers() {
+    DatabaseReference usersRef = FirebaseDatabase.instance.ref().child('users');
 
-      if (data != null && data is Map<dynamic, dynamic>) {
-        List<User> fetchedUsers = [];
-        data.forEach((key, value) {
-          fetchedUsers.add(User.fromSnapshot(value));
-        });
-        setState(() {
-          users = fetchedUsers;
-          selectedUsers = List.generate(users.length, (index) => false);
-        });
+    usersRef.onValue.listen((event) {
+      _logger.i('PASA AQUÍ');
+      if (event.snapshot.value != null) {
+        List<dynamic>? usersData = event.snapshot.value as List<dynamic>?;
+
+        if (usersData != null) {
+          setState(() {
+            userList = usersData.cast<Map<dynamic, dynamic>>().toList();
+          });
+
+          _logger.i('Lista de usuarios: $userList');
+        }
       }
     }, onError: (error) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Error al obtener usuarios')),
-      );
+      _logger.e('Error al obtener usuarios: $error');
     });
   }
+
+  // Future<void> fetchUsersFromFirebase() async {
+  //   final usersRef = FirebaseDatabase.instance.ref().child('users');
+  //   usersRef.onValue.listen((event) {
+  //     DataSnapshot snapshot = event.snapshot;
+  //     dynamic data = snapshot.value;
+
+  //     if (data != null && data is Map<dynamic, dynamic>) {
+  //       List<User> fetchedUsers = [];
+  //       data.forEach((key, value) {
+  //         fetchedUsers.add(User.fromSnapshot(value));
+  //       });
+  //       setState(() {
+  //         users = fetchedUsers;
+  //         selectedUsers = List.generate(users.length, (index) => false);
+  //       });
+  //     }
+  //   }, onError: (error) {
+  //     ScaffoldMessenger.of(context).showSnackBar(
+  //       const SnackBar(content: Text('Error al obtener usuarios')),
+  //     );
+  //   });
+  // }
 
   Future<void> eliminarUsuariosEnFirebase(List<int> usuariosAEliminar) async {
     final usersRef = FirebaseDatabase.instance.ref().child('users');
     for (int userId in usuariosAEliminar) {
       usersRef.child(userId.toString()).remove().then((_) {
-        logger.d('Usuario con ID $userId eliminado con éxito');
+        _logger.d('Usuario con ID $userId eliminado con éxito');
       }).catchError((error) {
-        logger.e('Error al eliminar el usuario con ID $userId: $error');
+        _logger.e('Error al eliminar el usuario con ID $userId: $error');
       });
     }
   }
@@ -206,9 +229,8 @@ class _UserListScreenState extends State<UserListScreen> {
         backgroundColor: Colors.orange,
       ),
       body: ListView.builder(
-        itemCount: users.length,
+        itemCount: userList.length,
         itemBuilder: (context, index) {
-          final user = users[index];
           return ListTile(
             leading: Checkbox(
               activeColor: Colors.orange,
@@ -219,8 +241,8 @@ class _UserListScreenState extends State<UserListScreen> {
                 });
               },
             ),
-            title: Text(
-                'ID: ${user.key}, Usuario: ${user.email}, Email: ${user.pass}'),
+            title: Text(userList[index]['email'] ?? 'Sin email'),
+            subtitle: Text(userList[index]['pass'] ?? 'Sin password'),
           );
         },
       ),

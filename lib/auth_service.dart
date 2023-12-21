@@ -16,6 +16,7 @@ class AuthService {
         password: password,
       );
       User? user = result.user;
+      _logger.i('Usuario $email creado correctamente');
       return user;
     } catch (e) {
       _logger.e('Error al registrar el usuario: $e');
@@ -23,22 +24,43 @@ class AuthService {
     }
   }
 
-  // Método para iniciar sesión con correo electrónico y contraseña
-  Future<User?> signInWithEmailAndPassword(
-    String email,
-    String password,
-  ) async {
-    try {
-      UserCredential result = await _auth.signInWithEmailAndPassword(
-        email: email,
-        password: password,
-      );
-      User? user = result.user;
-      return user;
-    } catch (e) {
-      _logger.e('Error al iniciar sesión: $e');
-      return null;
-    }
+  // // Método para iniciar sesión con correo electrónico y contraseña
+  // Future<User?> signInWithEmailAndPassword(
+  //   String email,
+  //   String password,
+  // ) async {
+  //   try {
+  //     UserCredential result = await _auth.signInWithEmailAndPassword(
+  //       email: email,
+  //       password: password,
+  //     );
+  //     User? user = result.user;
+  //     _logger.i('Se ha logueado el user: $email');
+  //     return user;
+  //   } catch (e) {
+  //     _logger.e('Error al iniciar sesión: $e');
+  //     return null;
+  //   }
+  // }
+
+  void signInWithEmailAndPassword(String email, String password) {
+    FirebaseAuth.instance
+        .signInWithEmailAndPassword(
+      email: email,
+      password: password,
+    )
+        .then((UserCredential userCredential) {
+      _logger.i('User signed in: ${userCredential.user!.email}');
+    }).catchError((error) {
+      if (error.code == 'user-not-found') {
+        _logger.i('There is no user with that email.');
+      }
+
+      if (error.code == 'invalid-email') {
+        _logger.i('That email address is invalid.');
+      }
+      _logger.e(error);
+    });
   }
 
   // Método para cerrar sesión

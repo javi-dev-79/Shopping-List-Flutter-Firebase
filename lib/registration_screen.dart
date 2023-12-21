@@ -19,7 +19,7 @@ class RegistrationScreen extends StatelessWidget {
 
   final DatabaseReference dbRef = FirebaseDatabase.instance.ref();
 
-  AuthService authService = AuthService();
+  final AuthService authService = AuthService();
 
   RegistrationScreen({Key? key}) : super(key: key);
 
@@ -106,4 +106,5 @@ class RegistrationScreen extends StatelessWidget {
       ),
     );
   }
+  
 }

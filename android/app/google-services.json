@@ -1,6 +1,7 @@
 {
   "project_info": {
     "project_number": "558508613379",
+    "firebase_url": "https://flutter-shopping-list-ab54b-default-rtdb.firebaseio.com",
     "project_id": "flutter-shopping-list-ab54b",
     "storage_bucket": "flutter-shopping-list-ab54b.appspot.com"
   },
