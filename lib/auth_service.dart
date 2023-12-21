@@ -1,8 +1,10 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:logger/logger.dart';
+import 'package:flutter_application_3/bottom_nav_bar.dart';
 
 class AuthService {
-  final FirebaseAuth _auth = FirebaseAuth.instance;
+  static final FirebaseAuth _auth = FirebaseAuth.instance;
+  static bool isLoggedIn = false;
   final Logger _logger = Logger();
 
   // Método para registrar un usuario con correo electrónico y contraseña
@@ -24,43 +26,41 @@ class AuthService {
     }
   }
 
-  // // Método para iniciar sesión con correo electrónico y contraseña
-  // Future<User?> signInWithEmailAndPassword(
-  //   String email,
-  //   String password,
-  // ) async {
+  // Future<bool> signInWithEmailAndPassword(String email, String password) async {
   //   try {
   //     UserCredential result = await _auth.signInWithEmailAndPassword(
   //       email: email,
   //       password: password,
   //     );
   //     User? user = result.user;
-  //     _logger.i('Se ha logueado el user: $email');
-  //     return user;
+  //     return user != null;
   //   } catch (e) {
   //     _logger.e('Error al iniciar sesión: $e');
-  //     return null;
+  //     return false;
   //   }
   // }
 
-  void signInWithEmailAndPassword(String email, String password) {
-    FirebaseAuth.instance
-        .signInWithEmailAndPassword(
-      email: email,
-      password: password,
-    )
-        .then((UserCredential userCredential) {
-      _logger.i('User signed in: ${userCredential.user!.email}');
-    }).catchError((error) {
-      if (error.code == 'user-not-found') {
-        _logger.i('There is no user with that email.');
-      }
+  Future<bool> signInWithEmailAndPassword(String email, String password) async {
+    try {
+      UserCredential result = await _auth.signInWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+      User? user = result.user;
 
-      if (error.code == 'invalid-email') {
-        _logger.i('That email address is invalid.');
+      if (user != null) {
+        // Si el usuario no es null, la autenticación fue exitosa
+        // Establecemos isLoggedIn en true y devolvemos true
+        isLoggedIn = true;
+        return true;
+      } else {
+        // Si el usuario es null, la autenticación falló
+        return false;
       }
-      _logger.e(error);
-    });
+    } catch (e) {
+      _logger.e('Error al iniciar sesión: $e');
+      return false;
+    }
   }
 
   // Método para cerrar sesión
@@ -82,4 +82,17 @@ class AuthService {
   }
 
   // Otros métodos de autenticación según sea necesario para tu aplicación
+
+  // Método para verificar el estado de autenticación
+  static Future<bool> checkAuthStatus() async {
+    try {
+      User? user = _auth.currentUser;
+      isLoggedIn = user != null;
+      return isLoggedIn;
+    } catch (e) {
+      // Manejo de errores si ocurren al verificar el estado de autenticación
+      print('Error al verificar el estado de autenticación: $e');
+      return false;
+    }
+  }
 }

@@ -1,56 +1,39 @@
 import 'package:flutter/material.dart';
-
+import 'package:flutter_application_3/auth_service.dart';
+import 'package:logger/logger.dart';
 import 'login_screen.dart';
 import 'private_screen.dart';
 import 'public_screen.dart';
 
 class MyBottomNavigationBar extends StatefulWidget {
-  const MyBottomNavigationBar({super.key});
+  final int selectedIndex;
+
+  const MyBottomNavigationBar({super.key, required this.selectedIndex});
 
   @override
   _MyBottomNavigationBarState createState() => _MyBottomNavigationBarState();
+
 }
 
 class _MyBottomNavigationBarState extends State<MyBottomNavigationBar> {
   int _selectedIndex = 0; // Índice de la página seleccionada
-  bool loggedIn = false; // Estado de inicio de sesión
+  final Logger _logger = Logger();
 
   @override
   void initState() {
     super.initState();
+    _selectedIndex = widget.selectedIndex;
     // Inicializa el estado de inicio de sesión como falso
-    loggedIn = false;
   }
 
   @override
   Widget build(BuildContext context) {
-    Widget body;
-
-    if (_selectedIndex == 0) {
-      body = const PublicScreen();
-    } else {
-      body = loggedIn ? const PrivateScreen() : const PublicScreen();
-    }
-
     return Scaffold(
       appBar: AppBar(
         title: const Text('Mi Aplicación'),
         backgroundColor: Colors.orange,
-        actions: <Widget>[
-          if (!loggedIn)
-            IconButton(
-              icon: const Icon(Icons.login),
-              onPressed: _handleLoginButton,
-            ),
-          if (loggedIn)
-            IconButton(
-              icon: const Icon(Icons.logout),
-              onPressed:
-                  _handleLogoutButton, // Agregamos el manejador de cierre de sesión
-            ),
-        ],
       ),
-      body: body,
+      body: _getBody(),
       bottomNavigationBar: BottomNavigationBar(
         items: const [
           BottomNavigationBarItem(
@@ -70,10 +53,27 @@ class _MyBottomNavigationBarState extends State<MyBottomNavigationBar> {
     );
   }
 
+  // Widget _getBody() {
+  //   if (_selectedIndex == 0 || !isLoggedIn) {
+  //     return const PublicScreen();
+  //   } else {
+  //     return const PrivateScreen();
+  //   }
+  // }
+
+  Widget _getBody() {
+    if (_selectedIndex == 1 && AuthService.isLoggedIn) {
+      return const PrivateScreen();
+    } else {
+      return const PublicScreen();
+    }
+  }
+
   void _onItemTapped(int index) {
+    _logger.i('El estado en onItemTapped es: ${AuthService.isLoggedIn}');
     setState(() {
-      if (index == 1 && !loggedIn) {
-        // El usuario selecciona "Privada" pero no está logueado
+      _selectedIndex = index;
+      if (_selectedIndex == 1 && !AuthService.isLoggedIn) {
         Navigator.of(context)
             .push(
           MaterialPageRoute(
@@ -83,51 +83,11 @@ class _MyBottomNavigationBarState extends State<MyBottomNavigationBar> {
             .then((result) {
           if (result == true) {
             setState(() {
-              loggedIn = true;
-              _selectedIndex = 1; // Cambia a la pantalla "Privada"
+              AuthService.isLoggedIn = true;
             });
           }
         });
-      } else {
-        _selectedIndex = index;
       }
-    });
-  }
-
-  void _handleLoginButton() {
-    Navigator.of(context)
-        .push(
-      MaterialPageRoute(
-        builder: (context) => LoginScreen(),
-      ),
-    )
-        .then((result) {
-      if (result == true) {
-        setState(() {
-          loggedIn = true;
-          if (loggedIn) {
-            _selectedIndex = 1; // Cambia a la pantalla "Privada"
-          }
-        });
-      }
-    });
-  }
-
-  void _handleLogoutButton() {
-    // Realiza la lógica de cierre de sesión (cambia el estado de loggedIn, redirige, etc.)
-    // Luego, muestra un SnackBar con el mensaje de confirmación.
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Has cerrado sesión, hasta luego...'),
-      ),
-    );
-
-    // Después de cerrar sesión, establece loggedIn como false y el índice seleccionado según tu lógica.
-    setState(() {
-      loggedIn = false;
-      _selectedIndex =
-          0; // Cambia a la pantalla "Pública" u otra pantalla inicial
     });
   }
 }

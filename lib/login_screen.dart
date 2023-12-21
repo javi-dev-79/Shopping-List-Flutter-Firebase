@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-// import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_application_3/auth_service.dart';
-import 'package:flutter_application_3/private_screen.dart';
-import 'registration_screen.dart';
+import 'package:flutter_application_3/bottom_nav_bar.dart';
+import 'package:flutter_application_3/registration_screen.dart';
 
 class LoginScreen extends StatelessWidget {
   final TextEditingController _emailController = TextEditingController();
@@ -10,26 +9,7 @@ class LoginScreen extends StatelessWidget {
 
   final AuthService authService = AuthService();
 
-  LoginScreen({Key? key}) : super(key: key);
-
-  // Future<void> _performLogin(String email, String password) async {
-  //   try {
-  //     UserCredential userCredential =
-  //         await FirebaseAuth.instance.signInWithEmailAndPassword(
-  //       email: email,
-  //       password: password,
-  //     );
-
-  //     if (userCredential.user != null) {
-  //       _logger.d(
-  //           'Inicio de sesión exitoso para el usuario ${userCredential.user!.email}');
-  //     } else {
-  //       _logger.e('Credenciales incorrectas');
-  //     }
-  //   } on FirebaseAuthException catch (e) {
-  //     _logger.e('Error al iniciar sesión: ${e.message}');
-  //   }
-  // }
+  LoginScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -75,17 +55,29 @@ class LoginScreen extends StatelessWidget {
             ),
             const SizedBox(height: 20),
             ElevatedButton(
-              onPressed: () {
+              onPressed: () async {
                 String email = _emailController.text;
                 String password = _passwordController.text;
-                // _performLogin(email, password);
-                authService.signInWithEmailAndPassword(email, password);
-                // Navigate to private screen
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (context) => const PrivateScreen(),
-                  ),
-                );
+
+                bool isLoggedIn = await authService.signInWithEmailAndPassword(
+                    email, password);
+
+                if (isLoggedIn) {
+                  AuthService.isLoggedIn = true;
+                  Navigator.of(context).pushReplacement(
+                    MaterialPageRoute(
+                      builder: (context) =>
+                          const MyBottomNavigationBar(selectedIndex: 1),
+                    ),
+                  );
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text(
+                          'Credenciales incorrectas. Por favor, inténtelo de nuevo.'),
+                    ),
+                  );
+                }
               },
               style: ButtonStyle(
                 backgroundColor: MaterialStateProperty.all(Colors.orange),
