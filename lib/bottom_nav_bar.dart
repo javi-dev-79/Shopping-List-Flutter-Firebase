@@ -29,14 +29,37 @@ class _MyBottomNavigationBarState extends State<MyBottomNavigationBar> {
       appBar: AppBar(
         title: const Text('Mi Aplicación'),
         backgroundColor: Colors.orange,
+        // actions: [
+        //   IconButton(
+        //     icon: const Icon(Icons.exit_to_app),
+        //     onPressed: () {
+        //       // Aquí debes implementar la lógica para realizar el logout
+        //       _performLogout();
+        //     },
+        //   ),
+        // ],
         actions: [
-          IconButton(
-            icon: const Icon(Icons.exit_to_app),
-            onPressed: () {
-              // Aquí debes implementar la lógica para realizar el logout
-              _performLogout();
-            },
-          ),
+          // Mostrar el botón de logout si el usuario está logueado
+          if (AuthService.isLoggedIn)
+            IconButton(
+              icon: const Icon(Icons.logout),
+              onPressed: () {
+                // Llamar al método de logout del AuthService
+                _performLogout();
+              },
+            ),
+          // Mostrar el botón de login si el usuario no está logueado
+          if (!AuthService.isLoggedIn)
+            IconButton(
+              icon: const Icon(Icons.login),
+              onPressed: () {
+                // Navegar a la pantalla de login al hacer clic en el botón
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => LoginScreen()),
+                );
+              },
+            ),
         ],
       ),
       body: _getBody(),
@@ -91,14 +114,12 @@ class _MyBottomNavigationBarState extends State<MyBottomNavigationBar> {
 
   void _performLogout() {
     AuthService.logout(); // Ejemplo: cómo podrías llamar a un método logout
-    // Navigator.of(context).push(MaterialPageRoute(
-    //   builder: (context) => LoginScreen(),
-    // ));
-    // Navega a la pantalla de inicio o pantalla lógica después del logout
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(
-        builder: (context) => AuthService.isLoggedIn ? const PrivateScreen() : const PublicScreen(),
+        builder: (context) => AuthService.isLoggedIn
+            ? const MyBottomNavigationBar(selectedIndex: 1)
+            : const MyBottomNavigationBar(selectedIndex: 0),
       ),
     );
   }
